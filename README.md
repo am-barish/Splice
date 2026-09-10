@@ -14,24 +14,13 @@ Learning Tasks*.
 ## Install
 
 ```bash
-<<<<<<< HEAD
-git clone <repo-url> && cd splice
-=======
 git clone <repo-url> && cd Splice
->>>>>>> 476dc6c (Updated Repo)
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-<<<<<<< HEAD
-All commands are run from the repository root.
-
-Python 3.10+. Runtimes in the paper were measured on an Apple MacBook M3 Pro
-with 36 GB RAM.
-=======
 Python 3.10+. All commands are run from the repository root. Runtimes in the
 paper were measured on an Apple MacBook M3 Pro with 36 GB RAM.
->>>>>>> 476dc6c (Updated Repo)
 
 ---
 
@@ -61,13 +50,6 @@ data_prep/
   loaders.py            shared dataset loading and source construction
   splits.py             canonical split seeds and validation fractions
   valsize_splits.py     nested stratified validation draws
-<<<<<<< HEAD
-  warm_caches.py        pre-builds surrogate and gradient caches
-  regen_meta_history.py rebuilds Splice-DP artifacts from the val split
-harness/
-  stabilize.py          oracle training-config patches and probes
-  repeated_splits.py    repeated-split driver (to run experiments)
-=======
   warm_caches.py        pre-builds Wilds / Amazon feature caches
   regen_meta_history.py rebuilds Splice-DP artifacts from the val split
 experiments/
@@ -75,73 +57,12 @@ experiments/
   stabilize.py          oracle training-config patches and probes
 acs_cache/              ACS parquet, surrogate and gradient artifacts (shipped)
 target_splits/          the 30 ACS target splits (shipped)
->>>>>>> 476dc6c (Updated Repo)
 ```
 
 ---
 
 ## Data
 
-<<<<<<< HEAD
-Expected under a directory passed as `--data-dir` (default `.`), with derived
-artifacts written to `--cache-dir`:
-
-Before any multi-seed run, build the shared caches once. Several artifacts are
-written lazily on first use and shared across processes — the ACS parquet, the
-target splits, `<DS>_surrogate.joblib` (Splice-DP) and `<DS>_gradients.joblib`
-(Splice-Grad):
-
-```bash
-python -m data_prep.warm_caches --methods normal dp gradmatch
-python -m experiments.create_acs_splits
-```
-
-`create_acs_splits` writes 30 splits per ACS dataset (seeds 12345 and 1000-1028)
-to `target_splits/`, matching the replicates behind main experiment table. For Wilds and
-Amazon, the Splice-DP artifacts are rebuilt from the validation split with:
-
-```bash
-python -m data_prep.regen_meta_history --family wilds  --iters 5
-python -m data_prep.regen_meta_history --family amazon --iters 5
-```
-
-- **ACS** — Folktables downloads on first use. Build contexts with
-  `python -m data_prep.acs`, then create canonical splits:
-  ```bash
-  python -m experiments.create_acs_splits
-  ```
-- **Amazon Reviews** — `reviews_raw.parquet` plus LSA features
-  `reviews_features_lsa150.parquet`. Re-split with:
-  ```bash
-  python -m experiments.resplit_amazon --val-frac 0.30 --seed 42 --stratify
-  ```
-- **Wilds** — camera-trap images; features are extracted once with a frozen
-  ImageNet ResNet-18 (512-dim) and cached.
-- **SANTOS (IPO / YDNPA)** — monthly spending CSVs in a directory passed via
-  `--data-dir`, one table held out as the target via `--target-file`.
-  
-- **SynPubCov** — 1,000 synthetic sources of 5,000 examples each, drawn from
-  ACSPublicCoverage by stratified resampling within label strata with a
-  per-source positive rate spread uniformly around the pool base rate
-  (`repartition_stratified_skew` in `data_prep/acs.py`).
-
-ACS uses a 30/70 validation/test split and base seed `12345`; Wilds and Amazon
-use base seed `42`.
-
----
-
-## Example: Running multiseed experiment for Splice:
-
-```bash
-python -m harness.repeated_splits \
-    --dataset ACSPublicCoverage --family acs \
-    --method normal --algos splice \
-    --n-splits 30 --smax 7 --kmax 7 --split-seed-base 1000
-```
-
-Repeat with `--method dp` and `--method gradmatch` for the surrogate rows, and
-with `--family wilds` / `--family amazon` for those benchmarks.
-=======
 - **ACS Folktables** — three datasets (ACSIncome, ACSPublicCoverage,
   ACSTravelTime), 15 U.S. states as candidate sources and Puerto Rico as the
   held-out target, 30/70 validation/test split, base seed `12345`. Contexts are
@@ -184,7 +105,6 @@ Repeat with `--method dp` and `--method gradmatch` for the surrogate rows, and
 
 Results are written to `--out` (default `results/repeated_splits`) as a
 `_runs.csv` with one row per split and a `_summary.csv` with the aggregates.
->>>>>>> 476dc6c (Updated Repo)
 
 ---
 
@@ -193,18 +113,6 @@ Results are written to `--out` (default `results/repeated_splits`) as a
 | Flag | Meaning | Paper setting |
 |---|---|---|
 | `--smax` | budget *B*, max active-set size | ACS 7, Amazon 10, Wilds 15 |
-<<<<<<< HEAD
-| `--kmax` | max swap size *k*<sub>max</sub> | `= B` in Paper |
-| `--method` | marginal-gain oracle | `normal`/`dp`/`gradmatch` |
-| `--val-frac` | fraction of target guiding selection | 0.30 |
-| `--n-jobs` | worker processes for the parallel path | 8 for reported speedups |
-
-The profit function is `accuracy*100 + lambda * tpr_parity`, where `tpr_parity`
-is the **signed** difference `TPR(protected) - TPR(privileged)`
-(`core/metrics.py`). `lambda = 50` on ACSIncome and `0` elsewhere.
-
----
-=======
 | `--method` | marginal-gain oracle | `normal` / `dp` / `gradmatch` |
 | `--n-splits` | target splits (ACS) or model seeds (Wilds, Amazon) | 30 / 10 |
 | `--val-frac` | fraction of target guiding selection | 0.30 |
@@ -217,4 +125,3 @@ term is signed, a classifier that reverses the disparity can score above 100.
 
 ---
 
->>>>>>> 476dc6c (Updated Repo)
