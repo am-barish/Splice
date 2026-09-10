@@ -65,7 +65,7 @@ def main():
     splice_ext.install()
 
     if args.family == "amazon" and args.amazon_epochs > 0:
-        from harness import stabilize
+        from experiments import stabilize
         stabilize.patch_amazon(epochs=args.amazon_epochs, lr=5e-3, n_avg=args.amazon_navg)
     from surrogates.dataprofiles_unstructured import generate_meta_history
 

@@ -14,15 +14,24 @@ Learning Tasks*.
 ## Install
 
 ```bash
+<<<<<<< HEAD
 git clone <repo-url> && cd splice
+=======
+git clone <repo-url> && cd Splice
+>>>>>>> 476dc6c (Updated Repo)
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+<<<<<<< HEAD
 All commands are run from the repository root.
 
 Python 3.10+. Runtimes in the paper were measured on an Apple MacBook M3 Pro
 with 36 GB RAM.
+=======
+Python 3.10+. All commands are run from the repository root. Runtimes in the
+paper were measured on an Apple MacBook M3 Pro with 36 GB RAM.
+>>>>>>> 476dc6c (Updated Repo)
 
 ---
 
@@ -52,17 +61,28 @@ data_prep/
   loaders.py            shared dataset loading and source construction
   splits.py             canonical split seeds and validation fractions
   valsize_splits.py     nested stratified validation draws
+<<<<<<< HEAD
   warm_caches.py        pre-builds surrogate and gradient caches
   regen_meta_history.py rebuilds Splice-DP artifacts from the val split
 harness/
   stabilize.py          oracle training-config patches and probes
   repeated_splits.py    repeated-split driver (to run experiments)
+=======
+  warm_caches.py        pre-builds Wilds / Amazon feature caches
+  regen_meta_history.py rebuilds Splice-DP artifacts from the val split
+experiments/
+  repeated_splits.py    repeated-split driver
+  stabilize.py          oracle training-config patches and probes
+acs_cache/              ACS parquet, surrogate and gradient artifacts (shipped)
+target_splits/          the 30 ACS target splits (shipped)
+>>>>>>> 476dc6c (Updated Repo)
 ```
 
 ---
 
 ## Data
 
+<<<<<<< HEAD
 Expected under a directory passed as `--data-dir` (default `.`), with derived
 artifacts written to `--cache-dir`:
 
@@ -121,6 +141,50 @@ python -m harness.repeated_splits \
 
 Repeat with `--method dp` and `--method gradmatch` for the surrogate rows, and
 with `--family wilds` / `--family amazon` for those benchmarks.
+=======
+- **ACS Folktables** — three datasets (ACSIncome, ACSPublicCoverage,
+  ACSTravelTime), 15 U.S. states as candidate sources and Puerto Rico as the
+  held-out target, 30/70 validation/test split, base seed `12345`. Contexts are
+  built by `data_prep/acs.py`.
+- **Wilds** — camera-trap images from 30 locations; features extracted once
+  with a frozen ImageNet ResNet-18 (512-dim) and cached. Splice-DP artifacts:
+  ```bash
+  python -m data_prep.regen_meta_history --family wilds --iters 5
+  ```
+- **Amazon Reviews** — 24 categories as sources, 3 as target;
+  `reviews_raw.parquet` plus LSA features `reviews_features_lsa150.parquet`.
+  Splice-DP artifacts:
+  ```bash
+  python -m data_prep.regen_meta_history --family amazon --iters 5
+  ```
+  Both write `history_list_<family>_val.pkl` and
+  `<Family>_target_profile_val.pkl` to the repository root.
+- **SynPubCov** — 1,000 synthetic sources of 5,000 examples each, drawn from
+  ACSPublicCoverage by stratified resampling within label strata with a
+  per-source positive rate spread around the pool base rate
+  (`repartition_stratified_skew` in `data_prep/acs.py`).
+
+Wilds and Amazon use base seed `42`.
+
+---
+
+## Running the repeated-split experiment
+
+```bash
+python -m experiments.repeated_splits \
+    --dataset ACSPublicCoverage --family acs \
+    --method normal --algos splice \
+    --n-splits 30 --smax 7 --split-seed-base 1000 \
+    --cache-dir acs_cache
+```
+
+Repeat with `--method dp` and `--method gradmatch` for the surrogate rows, and
+`--family wilds` / `--family amazon` for those benchmarks. `--algos` also takes
+`grasp`, `dsdm`, `greedy`, `random`, `all_sources`, `single_source`.
+
+Results are written to `--out` (default `results/repeated_splits`) as a
+`_runs.csv` with one row per split and a `_summary.csv` with the aggregates.
+>>>>>>> 476dc6c (Updated Repo)
 
 ---
 
@@ -129,6 +193,7 @@ with `--family wilds` / `--family amazon` for those benchmarks.
 | Flag | Meaning | Paper setting |
 |---|---|---|
 | `--smax` | budget *B*, max active-set size | ACS 7, Amazon 10, Wilds 15 |
+<<<<<<< HEAD
 | `--kmax` | max swap size *k*<sub>max</sub> | `= B` in Paper |
 | `--method` | marginal-gain oracle | `normal`/`dp`/`gradmatch` |
 | `--val-frac` | fraction of target guiding selection | 0.30 |
@@ -139,3 +204,17 @@ is the **signed** difference `TPR(protected) - TPR(privileged)`
 (`core/metrics.py`). `lambda = 50` on ACSIncome and `0` elsewhere.
 
 ---
+=======
+| `--method` | marginal-gain oracle | `normal` / `dp` / `gradmatch` |
+| `--n-splits` | target splits (ACS) or model seeds (Wilds, Amazon) | 30 / 10 |
+| `--val-frac` | fraction of target guiding selection | 0.30 |
+| `--eval-seed` | model seed | 42 |
+
+The profit function is `accuracy*100 + lambda * tpr_parity`, where `tpr_parity`
+is the **signed** difference `TPR(protected) - TPR(privileged)`
+(`core/metrics.py`). `lambda = 50` on ACSIncome and `0` elsewhere. Because the
+term is signed, a classifier that reverses the disparity can score above 100.
+
+---
+
+>>>>>>> 476dc6c (Updated Repo)

@@ -9,7 +9,7 @@ requires-python = ">=3.10"
 dynamic = ["dependencies"]
 
 [tool.setuptools]
-packages = ["baselines", "core", "data_prep", "experiments", "harness", "surrogates"]
+packages = ["baselines", "core", "data_prep", "experiments", "surrogates"]
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}

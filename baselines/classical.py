@@ -55,7 +55,7 @@ def greedy(
 ) -> Tuple[float, List, int, int, float, int]:
     start = time.time()
     individual_profits = [get_profit(ctx, [s])
-                          for s in tqdm(source_list, desc="Greedy: solo profits",
+                          for s in tqdm(source_list, desc="Greedy",
                                         leave=False)]
     sorted_idx = sorted(range(len(individual_profits)),
                         key=individual_profits.__getitem__, reverse=True)
